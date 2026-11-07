@@ -5,12 +5,12 @@ function salvar() {
   const form = document.getElementById("form");
   if (!form.reportValidity()) return;
 
-  const aluno = {
-    nome: document.getElementById("nome").value,
-    idade: Number(document.getElementById("idade").value),
-    curso: document.getElementById("curso").value,
-    notaFinal: Number(document.getElementById("nota").value)
-  };
+  const aluno = new Aluno(
+    document.getElementById("nome").value,
+    Number(document.getElementById("idade").value),
+    document.getElementById("curso").value,
+    Number(document.getElementById("nota").value)
+  );
 
   if (editando === null) {
     alunos.push(aluno);
@@ -52,7 +52,7 @@ function renderizar() {
     const aluno = alunos[i];
     const linha = document.createElement("tr");
 
-    for (const valor of [aluno.nome, aluno.idade, aluno.curso, aluno.notaFinal]) {
+    for (const valor of [aluno.nome, aluno.idade, aluno.curso, aluno.notaFinal, aluno.isAprovado() ? "Aprovado" : "Reprovado"]) {
       const celula = document.createElement("td");
       celula.textContent = valor;
       linha.appendChild(celula);

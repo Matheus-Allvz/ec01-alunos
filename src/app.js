@@ -1,5 +1,6 @@
 const alunos = [];
 let editando = null;
+let relatorioAtual = null;
 
 const $ = id => document.getElementById(id);
 
@@ -22,7 +23,23 @@ const adicionar = aluno => alunos.push(aluno);
 const atualizar = (indice, aluno) => alunos.splice(indice, 1, aluno);
 const remover = indice => alunos.splice(indice, 1)[0];
 
-const criarBotao = (texto, aoClicar) => {
+const media = valores => valores.length ? (valores.reduce((soma, valor) => soma + valor, 0) / valores.length).toFixed(2) : "0";
+
+const relatorios = {
+  aprovados: () => alunos.filter(aluno => aluno.isAprovado()).map(aluno => aluno.toString()),
+  mediaNotas: () => [`Média das notas finais: ${media(alunos.map(aluno => aluno.notaFinal))}`],
+  mediaIdades: () => [`Média das idades: ${media(alunos.map(aluno => aluno.idade))}`],
+  nomes: () => alunos.map(aluno => aluno.nome).sort((a, b) => a.localeCompare(b)),
+  porCurso: () => [...$("curso").options].map(opcao => `${opcao.value}: ${alunos.filter(aluno => aluno.curso === opcao.value).length}`)
+};
+
+const exibirRelatorio = () => {
+  if (!relatorioAtual) return;
+  const linhas = relatorios[relatorioAtual]();
+  $("relatorio").textContent = linhas.length ? linhas.join("\n") : "Nenhum aluno encontrado.";
+};
+
+const criarBotao =(texto, aoClicar) => {
   const botao = document.createElement("button");
   botao.type = "button";
   botao.textContent = texto;
@@ -62,7 +79,16 @@ const renderizar = () => {
 
     tabela.appendChild(linha);
   });
+
+  exibirRelatorio();
 };
+
+document.querySelectorAll("[data-relatorio]").forEach(botao => {
+  botao.addEventListener("click", function () {
+    relatorioAtual = this.dataset.relatorio;
+    exibirRelatorio();
+  });
+});
 
 $("salvar").addEventListener("click", function () {
   if (!$("form").reportValidity()) return;
